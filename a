@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manipulação de Matrizes</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+    }
+    canvas {
+      border: 1px solid black;
+      margin-top: 1rem;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 1rem;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Manipulação de Matrizes</h1>
+
+  <h2>Multiplicação de Matrizes</h2>
+  <pre id="matrizMultiplicada"></pre>
+
+  <h2>Imagem em Tons de Cinza com Matrizes</h2>
+  <canvas id="canvasCinza" width="200" height="200"></canvas>
+  <pre id="matrizImagem"></pre>
+
+  <script>
+    // Multiplicação de matrizes
+    function multiplicarMatrizes(a, b) {
+      let resultado = [];
+      for (let i = 0; i < a.length; i++) {
+        resultado[i] = [];
+        for (let j = 0; j < b[0].length; j++) {
+          let soma = 0;
+          for (let k = 0; k < b.length; k++) {
+            soma += a[i][k] * b[k][j];
+          }
+          resultado[i][j] = soma;
+        }
+      }
+      return resultado;
+    }
+
+    const matrizA = [
+      [1, 2],
+      [3, 4]
+    ];
+    const matrizB = [
+      [5, 6],
+      [7, 8]
+    ];
+
+    const resultado = multiplicarMatrizes(matrizA, matrizB);
+    document.getElementById('matrizMultiplicada').textContent = JSON.stringify(resultado, null, 2);
+
+    // Criando imagem em tons de cinza com matriz
+    const canvas = document.getElementById("canvasCinza");
+    const ctx = canvas.getContext("2d");
+    const largura = canvas.width;
+    const altura = canvas.height;
+    const imagemData = ctx.createImageData(largura, altura);
+
+    const matrizTonsCinza = [];
+
+    for (let y = 0; y < altura; y++) {
+      const linha = [];
+      for (let x = 0; x < largura; x++) {
+        const tom = Math.floor((x + y) % 256); // valor entre 0 e 255
+        const index = (y * largura + x) * 4;
+        imagemData.data[index] = tom;     // R
+        imagemData.data[index + 1] = tom; // G
+        imagemData.data[index + 2] = tom; // B
+        imagemData.data[index + 3] = 255; // A
+        linha.push(tom);
+      }
+      matrizTonsCinza.push(linha);
+    }
+
+    ctx.putImageData(imagemData, 0, 0);
+    document.getElementById('matrizImagem').textContent = JSON.stringify(matrizTonsCinza.slice(0, 10), null, 2); // Exibe parte da matriz
+  </script>
+</body>
+</html>

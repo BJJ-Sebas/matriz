@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>JMatriz</title>
+  <style>
+      body {
+          font-family: sans-serif;
+          background: #222;
+          color: #fff;
+          display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 50px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .tabuleiro {
+      display: grid;
+      grid-template-columns: repeat(3, 80px);
+      gap: 5px;
+    }
+
+    .celula {
+      width: 80px;
+      height: 80px;
+      background: #444;
+      color: white;
+      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .celula:hover {
+      background: #666;
+    }
+
+    .vencedor {
+      background-color: royalblue !important;
+      color: #000;
+      font-weight: bold;
+    }
+
+    .status {
+      margin-top: 20px;
+      font-size: 1.2rem;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      background: #555;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #777;
+    }
+        #game {
+      position: relative;
+      width: 800px;
+      height: 400px;
+      margin: 50px auto;
+      background-color: #4ec34e;
+      border: 3px solid #222;
+      overflow: hidden;
+    }
+
+    #player {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background-color: red;
+      bottom: 100px;
+      left: 50px;
+    }
+
+    .platform {
+      position: absolute;
+      background-color: #654321;
+      height: 20px;
+    }
+
+    .ground {
+      width: 100%;
+      bottom: 0;
+      left: 0;
+    }
+
+    .block {
+      width: 100px;
+    }
+
+  </style>
+</head>
+<body>
+<h1>Trabalho Expomath Matrizes</h1>
+    <img src="https://scontent.ffln17-1.fna.fbcdn.net/v/t39.30808-6/475755099_1169727227848420_1080528362427173058_n.jpg?stp=dst-jpg_s640x640_tt6&_nc_cat=105&ccb=1-7&_nc_sid=127cfc&_nc_ohc=2eAqgvj2UnYQ7kNvwHxa0G_&_nc_oc=AdkTxihqNcB3FUawvQjuyjE873g-cSBTEdfneVGyntDMTJ7468zjuX7f4z4G3KVd-yMgG3lpD_VUMWTxsY0xIYmm&_nc_zt=23&_nc_ht=scontent.ffln17-1.fna&_nc_gid=mp97DHhP7opeTPZsv3W-1g&oh=00_AfLhA4q_Y3LSF-bL0lKn3YwcNt5HtCJWizDMowiQIbbK6Q&oe=6825FA8B" width="300">
+  <h1>Jogo da Velha</h1>
+
+  <div class="tabuleiro" id="tabuleiro"></div>
+
+  <div class="status" id="status">Jogador atual: X</div>
+
+  <button onclick="reiniciar()">Reiniciar</button>
+
+    <div id="game">
+    <div id="player"></div>
+    <div class="platform ground" style="top: 380px;"></div>
+    <div class="platform block" style="top: 280px; left: 200px;"></div>
+    <div class="platform block" style="top: 230px; left: 350px;"></div>
+    <div class="platform block" style="top: 180px; left: 500px;"></div>
+  </div>
+
+
+  <script>
+    const player = document.getElementById("player");
+    const game = document.getElementById("game");
+    const platforms = document.querySelectorAll(".platform");
+
+    let posX = 50;
+    let posY = 100;
+    let velX = 0;
+    let velY = 0;
+    let gravidade = 0.6;
+    let pulando = false;
+    let noChao = false;
+    const velocidade = 4;
+    const puloForca = 12;
+
+    const teclas = {
+      esquerda: false,
+      direita: false,
+      cima: false
+    };
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") teclas.esquerda = true;
+      if (e.key === "ArrowRight") teclas.direita = true;
+      if (e.key === " " || e.key === "ArrowUp") teclas.cima = true;
+    });
+
+    document.addEventListener("keyup", (e) => {
+      if (e.key === "ArrowLeft") teclas.esquerda = false;
+      if (e.key === "ArrowRight") teclas.direita = false;
+      if (e.key === " " || e.key === "ArrowUp") teclas.cima = false;
+    });
+
+    function loop() {
+      // Movimento lateral
+      if (teclas.esquerda) velX = -velocidade;
+      else if (teclas.direita) velX = velocidade;
+      else velX = 0;
+
+      // Pulo
+      if (teclas.cima && noChao && !pulando) {
+        velY = -puloForca;
+        pulando = true;
+        noChao = false;
+      }
+
+      velY += gravidade;
+
+      posX += velX;
+      posY += velY;
+
+      // Limites da tela
+      if (posX < 0) posX = 0;
+      if (posX > game.clientWidth - 40) posX = game.clientWidth - 40;
+
+      // Colisão com plataformas
+      noChao = false;
+      platforms.forEach(plataforma => {
+        const plat = plataforma.getBoundingClientRect();
+        const jog = player.getBoundingClientRect();
+        const platTop = plataforma.offsetTop;
+        const platLeft = plataforma.offsetLeft;
+        const platRight = platLeft + plataforma.offsetWidth;
+        const platBottom = platTop + plataforma.offsetHeight;
+
+        const playerBottom = posY + 40;
+        const playerRight = posX + 40;
+
+        if (
+          playerBottom >= platTop &&
+          playerBottom <= platTop + 10 &&
+          posX + 40 > platLeft &&
+          posX < platRight &&
+          velY >= 0
+        ) {
+          posY = platTop - 40;
+          velY = 0;
+          noChao = true;
+          pulando = false;
+        }
+      });
+
+      if (posY > game.clientHeight - 40) {
+        posY = game.clientHeight - 40;
+        velY = 0;
+        noChao = true;
+        pulando = false;
+      }
+
+      player.style.left = posX + "px";
+      player.style.top = posY + "px";
+
+      requestAnimationFrame(loop);
+    }
+
+    loop();
+
+    const tabuleiro = document.getElementById("tabuleiro");
+    const statusTexto = document.getElementById("status");
+    let jogadorAtual = "X";
+    let jogoAtivo = true;
+    let matriz = Array(3).fill(null).map(() => Array(3).fill(""));
+
+    function criarTabuleiro() {
+      tabuleiro.innerHTML = "";
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          const celula = document.createElement("div");
+          celula.classList.add("celula");
+          celula.dataset.linha = i;
+          celula.dataset.coluna = j;
+          celula.addEventListener("click", jogar);
+          celula.textContent = matriz[i][j];
+          tabuleiro.appendChild(celula);
+        }
+      }
+    }
+
+    function jogar(e) {
+      if (!jogoAtivo) return;
+
+      const i = e.target.dataset.linha;
+      const j = e.target.dataset.coluna;
+
+      if (matriz[i][j] !== "") return;
+
+      matriz[i][j] = jogadorAtual;
+      e.target.textContent = jogadorAtual;
+
+      const celulas = document.querySelectorAll(".celula");
+
+      if (verificarVitoria(i, j)) {
+        statusTexto.textContent = `Jogador ${jogadorAtual} venceu!`;
+        jogoAtivo = false;
+        marcarVencedor(i, j);
+        return;
+      }
+
+      if (verificarEmpate()) {
+        statusTexto.textContent = "Empate!";
+        jogoAtivo = false;
+        return;
+      }
+
+      jogadorAtual = jogadorAtual === "X" ? "O" : "X";
+      statusTexto.textContent = `Jogador atual: ${jogadorAtual}`;
+    }
+
+    function verificarVitoria(i, j) {
+      i = parseInt(i);
+      j = parseInt(j);
+      const valor = matriz[i][j];
+
+      // Linha, Coluna, Diagonais
+      return (
+        matriz[i].every(c => c === valor) ||
+        matriz.every(linha => linha[j] === valor) ||
+        (i === j && matriz.every((linha, idx) => linha[idx] === valor)) ||
+        (i + j === 2 && matriz.every((linha, idx) => linha[2 - idx] === valor))
+      );
+    }
+
+    function verificarEmpate() {
+      return matriz.flat().every(c => c !== "");
+    }
+
+    function marcarVencedor(i, j) {
+      const celulas = document.querySelectorAll(".celula");
+      i = parseInt(i);
+      j = parseInt(j);
+      const valor = matriz[i][j];
+
+      // Marcar linha
+      if (matriz[i].every(c => c === valor)) {
+        for (let col = 0; col < 3; col++) {
+          celulas[i * 3 + col].classList.add("vencedor");
+        }
+        return;
+      }
+
+      // Marcar coluna
+      if (matriz.every(linha => linha[j] === valor)) {
+        for (let row = 0; row < 3; row++) {
+          celulas[row * 3 + parseInt(j)].classList.add("vencedor");
+        }
+        return;
+      }
+
+      // Diagonal principal
+      if (i === j && matriz.every((linha, idx) => linha[idx] === valor)) {
+        for (let idx = 0; idx < 3; idx++) {
+          celulas[idx * 3 + idx].classList.add("vencedor");
+        }
+        return;
+      }
+
+      // Diagonal secundária
+      if (i + j === 2 && matriz.every((linha, idx) => linha[2 - idx] === valor)) {
+        for (let idx = 0; idx < 3; idx++) {
+          celulas[idx * 3 + (2 - idx)].classList.add("vencedor");
+        }
+      }
+    }
+
+    function reiniciar() {
+      matriz = Array(3).fill(null).map(() => Array(3).fill(""));
+      jogadorAtual = "X";
+      jogoAtivo = true;
+      statusTexto.textContent = "Jogador atual: X";
+      criarTabuleiro();
+    }
+
+    criarTabuleiro();
+  </script>
+</body>
+</html>
+
