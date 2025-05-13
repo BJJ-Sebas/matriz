@@ -4,11 +4,13 @@
 <head>
   <meta charset="UTF-8">
   <title>JMatriz</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
     body {
       font-family: sans-serif;
-      background-image: url(https://i.pinimg.com/originals/89/30/13/893013074b4be3c5f50b2a05545b9eca.gif);
-       background-size: cover;
+      background-image: url('https://i.pinimg.com/originals/89/30/13/893013074b4be3c5f50b2a05545b9eca.gif');
+      background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
       color: #fff;
@@ -19,7 +21,7 @@
     }
 
     h1 {
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     .tabuleiro {
@@ -72,14 +74,13 @@
 
     #game {
       position: relative;
-      width: 800px;
-      height: 400px;
+      width: 590px;
       margin: 50px auto;
-      background-image: url('https://www.accesoriosvilla.es/wp-content/uploads/2022/04/Cuadricula-AV-Accesorios-Villa.jpg');
-      background-size: cover;
+      background-image: url('https://st4.depositphotos.com/7508888/25094/v/450/depositphotos_250943498-stock-illustration-measured-grid-graph-plotting-grid.jpg');
+      background-size: auto;
       background-position: center;
       background-repeat: no-repeat;
-      height: 400px;
+      height: 550px;
       border: 3px solid #222;
       overflow: hidden;
     }
@@ -88,41 +89,66 @@
       position: absolute;
       width: 40px;
       height: 40px;
-      background-image: url('https://64.media.tumblr.com/430afc8efdaa6f4fafec8c8896b19d6c/tumblr_nw2t18KKG01uhnxeqo1_250.gif') ;
-      bottom: 100px;
+      background-color: orange;
       left: 50px;
     }
 
     .platform {
       position: absolute;
       background-color: blue;
-      height: 20px;
+      height: 5px;
+      width: 100px;
     }
+
     .block {
       width: 100px;
     }
-      .matriz-container {
+
+    .matriz-container {
       display: flex;
       gap: 2rem;
       margin-bottom: 1rem;
       align-items: flex-start;
     }
+
+    .matriz-container {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
     table {
       border-collapse: collapse;
-      margin-bottom: 1rem;
     }
+
     td {
-      border: 1px solid #ccc;
+      border: 1px solid #aaa;
       padding: 0;
     }
+
     input[type="number"] {
       width: 60px;
       height: 40px;
       text-align: center;
       font-size: 1rem;
       border: none;
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #fff;
     }
 
+    input[readonly] {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    #grafico {
+      max-width: 600px;
+      margin-top: 2rem;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1rem;
+      border-radius: 10px;
+    }
   </style>
 </head>
 
@@ -130,14 +156,19 @@
   <h1>Trabalho Expomath Matrizes</h1>
   <div id="game">
     <div id="player"></div>
-    <div class="platform ground" style="top: 380px;"></div>
-    <div class="platform block" style="top: 280px; left: 200px;"></div>
-    <div class="platform block" style="top: 230px; left: 350px;"></div>
-    <div class="platform block" style="top: 180px; left: 500px;"></div>
+    <div class="platform block" style="top: 110px; left: 400px;"></div>
+    <div class="platform block" style="top: 100px; left: 120px;"></div>
+    <div class="platform block" style="top: 204px; left: 220px;"></div>
+    <div class="platform block" style="top: 252px; left: 400px;"></div>
+    <div class="platform block" style="top: 350px; left: 250px;"></div>
+    <div class="platform block" style="top: 445px; left: 100px;"></div>
+    <div class="platform block" style="top: 445px; left: 400px;"></div>
   </div>
   <img
     src="https://scontent.ffln17-1.fna.fbcdn.net/v/t39.30808-6/475755099_1169727227848420_1080528362427173058_n.jpg?stp=dst-jpg_s640x640_tt6&_nc_cat=105&ccb=1-7&_nc_sid=127cfc&_nc_ohc=2eAqgvj2UnYQ7kNvwHxa0G_&_nc_oc=AdkTxihqNcB3FUawvQjuyjE873g-cSBTEdfneVGyntDMTJ7468zjuX7f4z4G3KVd-yMgG3lpD_VUMWTxsY0xIYmm&_nc_zt=23&_nc_ht=scontent.ffln17-1.fna&_nc_gid=mp97DHhP7opeTPZsv3W-1g&oh=00_AfLhA4q_Y3LSF-bL0lKn3YwcNt5HtCJWizDMowiQIbbK6Q&oe=6825FA8B"
-    width="300">
+    width="800">
+  <img src="https://cogera.com.br/wp-content/uploads/2018/06/cogera-energia-como-funciona-a-energia-solar-8-1.jpeg"
+    width="800">
   <h1>Jogo da Velha</h1>
 
   <div class="tabuleiro" id="tabuleiro"></div>
@@ -146,6 +177,36 @@
 
   <button onclick="reiniciar()">Reiniciar</button>
 
+  <div class="matriz-container">
+    <div>
+      <h2>Matriz A</h2>
+      <table>
+        <tbody id="matrizA"></tbody>
+      </table>
+    </div>
+
+    <div>
+      <h2>Matriz B</h2>
+      <table>
+        <tbody id="matrizB"></tbody>
+      </table>
+    </div>
+
+    <div>
+      <h2>Resultado</h2>
+      <table>
+        <tbody id="resultado"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div>
+    <button onclick="somarMatrizes()">Somar</button>
+    <button onclick="subtrairMatrizes()">Subtrair</button>
+    <button onclick="multiplicarMatrizes()">Multiplicar</button>
+  </div>
+
+  <canvas id="grafico"></canvas>
 
 
   <script>
@@ -361,6 +422,124 @@
     }
 
     criarTabuleiro();
+
+    function criarTabela(idPrefixo, idContainer, readonly = false) {
+      const tbody = document.getElementById(idContainer);
+      tbody.innerHTML = "";
+      for (let i = 0; i < 3; i++) {
+        const tr = document.createElement('tr');
+        for (let j = 0; j < 3; j++) {
+          const td = document.createElement('td');
+          const input = document.createElement('input');
+          input.type = 'number';
+          input.id = idPrefixo + i + j;
+          input.value = 0;
+          if (readonly) input.readOnly = true;
+          td.appendChild(input);
+          tr.appendChild(td);
+        }
+        tbody.appendChild(tr);
+      }
+    }
+
+    criarTabela('a', 'matrizA');
+    criarTabela('b', 'matrizB');
+    criarTabela('r', 'resultado', true);
+
+    function coletarMatriz(prefixo) {
+      return Array.from({ length: 3 }, (_, i) =>
+        Array.from({ length: 3 }, (_, j) => {
+          const valor = parseFloat(document.getElementById(prefixo + i + j).value);
+          return isNaN(valor) ? 0 : valor;
+        })
+      );
+    }
+
+    function mostrarResultadoNaTabela(resultado) {
+      resultado.forEach((linha, i) => {
+        linha.forEach((val, j) => {
+          document.getElementById("r" + i + j).value = val;
+        });
+      });
+      atualizarGrafico(resultado);
+    }
+
+    function somarMatrizes() {
+      const A = coletarMatriz("a");
+      const B = coletarMatriz("b");
+      const resultado = A.map((linha, i) =>
+        linha.map((val, j) => val + B[i][j])
+      );
+      mostrarResultadoNaTabela(resultado);
+    }
+
+    function subtrairMatrizes() {
+      const A = coletarMatriz("a");
+      const B = coletarMatriz("b");
+      const resultado = A.map((linha, i) =>
+        linha.map((val, j) => val - B[i][j])
+      );
+      mostrarResultadoNaTabela(resultado);
+    }
+
+    function multiplicarMatrizes() {
+      const A = coletarMatriz("a");
+      const B = coletarMatriz("b");
+      const resultado = Array(3).fill(null).map(() => Array(3).fill(0));
+
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          for (let k = 0; k < 3; k++) {
+            resultado[i][j] += A[i][k] * B[k][j];
+          }
+        }
+      }
+      mostrarResultadoNaTabela(resultado);
+    }
+
+    let grafico;
+
+
+    const backgroundColors = [
+      '#ff6384', '#36a2eb', '#cc65fe',
+      '#ffce56', '#4bc0c0', '#9966ff',
+      '#ff9f40', '#e7e9ed', '#3b3b3b'
+    ];
+
+    function atualizarGrafico(matriz) {
+      const labels = matriz.flatMap((linha, i) =>
+        linha.map((_, j) => `(${i + 1},${j + 1})`));
+      const datasets = matriz.map((linha, i) => ({
+        label: `Linha ${i + 1}`,
+        data: linha,
+        backgroundColor: `rgba(${(i + 1) * 80}, 100, 200, 0.5)`,
+        borderColor: `rgba(${(i + 1) * 80}, 100, 200, 1)`,
+        borderWidth: 1
+      }));
+
+      if (grafico) {
+        grafico.data.datasets = datasets;
+        grafico.update();
+      } else {
+        const ctx = document.getElementById("grafico").getContext("2d");
+        grafico = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: datasets
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      }
+    }
   </script>
 </body>
+
 </html>
